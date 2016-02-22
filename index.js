@@ -105,6 +105,7 @@ var module = function (options) {
     })
 };
 
+/*
 module({
   package: 'react',
   targetFs: mfs,
@@ -137,5 +138,5 @@ module({
 .catch(function (err) {
   console.log(err);
 })
-
+*/
 module.exports = module;
