@@ -28,24 +28,17 @@ var Extract = function (options) {
             package + '-' + version + '.tgz'
           );
           dependencies = data[0].dependencies || {};
-          resolve(read);
+          var write = targz().createWriteStream(path.resolve('temp', destination, package));
+          write.on('close', function (err) {
+            if (err) {
+              return reject();
+            }
+            resolve();
+          });
+          read.pipe(write);
         });
       });
     };
-
-    var openPackage = function (read) {
-      return new Promise(function (resolve, reject) {
-        var write = targz().createWriteStream(path.resolve('temp', destination, package));
-        write.on('close', function (err) {
-          if (err) {
-            return reject();
-          }
-          resolve();
-
-        });
-        read.pipe(write);
-      });
-    }
 
     var writePackage = function () {
       return new Promise(function (resolve, reject) {
@@ -68,7 +61,7 @@ var Extract = function (options) {
                   }
                   return fullPath;
                 }, '');
-                options.targetFs.writeFileSync(targetPath, content);
+                options.targetFs.writeFileSync(targetPath, content || ' ');
                 resolve();
               });
             });
@@ -80,7 +73,6 @@ var Extract = function (options) {
     }
 
     return getPackage(package)
-      .then(openPackage)
       .then(writePackage)
       .then(function () {
         console.log('Done with package', package);
