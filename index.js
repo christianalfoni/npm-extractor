@@ -88,7 +88,7 @@ var Extract = function (options) {
     });
 }
 
-var module = function (options) {
+var moduleExport = function (options) {
   return Extract(options)
     .then(function () {
       return new Promise(function (resolve, reject) {
@@ -139,4 +139,4 @@ module({
   console.log(err);
 })
 */
-module.exports = module;
+module.exports = moduleExport;
