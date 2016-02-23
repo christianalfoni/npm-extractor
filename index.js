@@ -11,7 +11,6 @@ var rmdir = require('rmdir');
 var Extract = function (options) {
 
   var registryURL = options.options.registry;
-
   var extractPackages = function (package, version, destination) {
 
     var dependencies = null;
@@ -41,9 +40,7 @@ var Extract = function (options) {
           if (err) {
             return reject();
           }
-          setTimeout(function () {
           resolve();
-        }, 1000)
 
         });
         read.pipe(write);
@@ -53,19 +50,31 @@ var Extract = function (options) {
     var writePackage = function () {
       return new Promise(function (resolve, reject) {
         rreaddir(path.resolve('temp', destination, package, 'package'), function (err, files) {
-          files.forEach(function (file) {
-            var targetPath = file.replace(path.resolve('temp'), '').replace(/\/package\//g, '/');
-            var dirPath = path.dirname(targetPath);
-            dirPath.split(path.sep).reduce(function (fullPath, partPath, index) {
-              fullPath += (index === 1 ? '' : '/') + partPath;
-              if (!options.targetFs.existsSync(fullPath)) {
-                options.targetFs.mkdirSync(fullPath);
-              }
-              return fullPath;
-            }, '');
-            options.targetFs.writeFileSync(targetPath, fs.readFileSync(file));
-          });
-          resolve();
+          if (err) {
+            return reject();
+          }
+          Promise.all(files.map(function (file) {
+            return new Promise(function (resolve, reject) {
+              fs.readFile(file, 'utf-8', function (err, content) {
+                if (err) {
+                  reject(err);
+                }
+                var targetPath = file.replace(path.resolve('temp'), '').replace(/\/package\//g, '/');
+                var dirPath = path.dirname(targetPath);
+                dirPath.split(path.sep).reduce(function (fullPath, partPath, index) {
+                  fullPath += (index === 1 ? '' : '/') + partPath;
+                  if (!options.targetFs.existsSync(fullPath)) {
+                    options.targetFs.mkdirSync(fullPath);
+                  }
+                  return fullPath;
+                }, '');
+                options.targetFs.writeFileSync(targetPath, content);
+                resolve();
+              });
+            });
+          }))
+          .then(resolve)
+          .catch(reject);
         });
       });
     }
@@ -92,12 +101,15 @@ var moduleExport = function (options) {
   return Extract(options)
     .then(function () {
       return new Promise(function (resolve, reject) {
-        rmdir(path.resolve('temp', options.dest, options.package), function (err) {
-          if (err) {
-            return reject(err);
-          }
-          resolve();
-        });
+        setTimeout(function () {
+          rmdir(path.resolve('temp', options.dest, options.package), function (err) {
+            if (err) {
+              return reject(err);
+            }
+            resolve();
+          });
+        }, 500);
+
       });
     })
     .catch(function (err) {
@@ -105,8 +117,8 @@ var moduleExport = function (options) {
     })
 };
 
-/*
-module({
+
+moduleExport({
   package: 'react',
   targetFs: mfs,
   options: {
@@ -138,5 +150,5 @@ module({
 .catch(function (err) {
   console.log(err);
 })
-*/
+
 module.exports = moduleExport;
