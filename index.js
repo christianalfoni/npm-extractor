@@ -1,6 +1,7 @@
 var Registry = require('npm-registry');
 var request = require('request');
-var targz = require('tar.gz')
+var tar = require('tar')
+var zlib = require('zlib');
 var MemoryFs = require('memory-fs');
 var mfs = new MemoryFs();
 var fs = require('fs');
@@ -22,20 +23,31 @@ var Extract = function (options) {
             return reject();
           }
           var version = data[0].version;
+          dependencies = data[0].dependencies || {};
           var read = request(
             registryURL +
             package + '/-/' +
             package + '-' + version + '.tgz'
           );
-          dependencies = data[0].dependencies || {};
-          var write = targz().createWriteStream(path.resolve('temp', destination, package));
-          write.on('close', function (err) {
+
+          var unzip = zlib.createGunzip({
+            path: path.resolve('temp', 'unzip', destination, package),
+            strip: 0
+          });
+          var extract = tar.Extract({
+            path: path.resolve('temp', destination, package),
+            strip: 0
+          });
+
+          read.pipe(unzip);
+          unzip.pipe(extract);
+
+          extract.on('finish', function (err) {
             if (err) {
               return reject();
             }
             resolve();
           });
-          read.pipe(write);
         });
       });
     };
