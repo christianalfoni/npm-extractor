@@ -15,8 +15,6 @@ var Extract = function (options) {
   var registryURL = options.options.registry;
   var extractPackages = function (package, version, destination) {
 
-    var dependencies = null;
-
     var getPackage = function (package) {
       return new Promise(function (resolve, reject) {
         npm.packages.get(package, function (err, data) {
@@ -25,8 +23,7 @@ var Extract = function (options) {
           }
 
           version = semver.maxSatisfying(Object.keys(data[0].versions), version);
-
-          dependencies = data[0].dependencies || {};
+          var dependencies = data[0].dependencies || {};
           var read = request(
             registryURL +
             package + '/-/' +
@@ -49,13 +46,16 @@ var Extract = function (options) {
             if (err) {
               return reject();
             }
-            resolve(data);
+            resolve({
+              data: data,
+              dependencies: dependencies
+            });
           });
         });
       });
     };
 
-    var writePackage = function (data) {
+    var writePackage = function (result) {
       return new Promise(function (resolve, reject) {
         rreaddir(path.resolve('temp', destination, package, 'package'), function (err, files) {
           if (err) {
@@ -82,7 +82,7 @@ var Extract = function (options) {
             });
           }))
           .then(function () {
-            resolve(data);
+            resolve(result);
           })
           .catch(reject);
         });
@@ -91,13 +91,13 @@ var Extract = function (options) {
 
     return getPackage(package)
       .then(writePackage)
-      .then(function (data) {
-        console.log('Done with package', package);
+      .then(function (result) {
+        var dependencies = result.dependencies;
         return Promise.all(Object.keys(dependencies).map(function (key) {
           return extractPackages(key, dependencies[key], path.join(destination, package, 'package', 'node_modules'));
         }))
         .then(function () {
-          return data;
+          return result.data;
         });
       })
   };
