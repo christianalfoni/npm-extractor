@@ -8,6 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var rreaddir = require('recursive-readdir');
 var rmdir = require('rmdir');
+var semver = require('semver');
 
 var Extract = function (options) {
 
@@ -18,11 +19,13 @@ var Extract = function (options) {
 
     var getPackage = function (package) {
       return new Promise(function (resolve, reject) {
-        npm.packages.get(version ? package + '@' + version : package, function (err, data) {
+        npm.packages.get(package, function (err, data) {
           if (err) {
             return reject();
           }
-          var version = data[0].version;
+
+          version = semver.maxSatisfying(Object.keys(data[0].versions), version);
+
           dependencies = data[0].dependencies || {};
           var read = request(
             registryURL +
@@ -100,7 +103,7 @@ var Extract = function (options) {
   };
 
   var npm = new Registry(options.options);
-  return extractPackages(options.package, null, options.dest)
+  return extractPackages(options.package, options.version, options.dest)
     .catch(function (err) {
       console.log(err);
     });
@@ -118,7 +121,12 @@ var moduleExport = function (options) {
         });
       })
       .then(function () {
-        return data[0];
+        var version = semver.maxSatisfying(Object.keys(data[0].versions), options.version);
+        return {
+          name: data[0].name,
+          version: version,
+          main: data[0].versions[version].main
+        };
       });
     })
     .catch(function (err) {

@@ -4,6 +4,7 @@ var mfs = new MemoryFileSystem();
 
 extract({
   package: 'react',
+  version: '0.14.7',
   targetFs: mfs,
   options: {
     registry: 'http://registry.npmjs.org/',
