@@ -1,5 +1,8 @@
-/*
-moduleExport({
+var extract = require('./index.js');
+var MemoryFileSystem = require('memory-fs');
+var mfs = new MemoryFileSystem();
+
+extract({
   package: 'react',
   targetFs: mfs,
   options: {
@@ -17,6 +20,7 @@ moduleExport({
     var dirs = [];
     try {
       dirs = mfs.readdirSync(dir);
+      console.log(dir);
     } catch (e) {
       return;
     }
@@ -31,4 +35,3 @@ moduleExport({
 .catch(function (err) {
   console.log(err);
 })
-*/
