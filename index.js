@@ -46,13 +46,13 @@ var Extract = function (options) {
             if (err) {
               return reject();
             }
-            resolve();
+            resolve(data);
           });
         });
       });
     };
 
-    var writePackage = function () {
+    var writePackage = function (data) {
       return new Promise(function (resolve, reject) {
         rreaddir(path.resolve('temp', destination, package, 'package'), function (err, files) {
           if (err) {
@@ -78,19 +78,24 @@ var Extract = function (options) {
               });
             });
           }))
-          .then(resolve)
+          .then(function () {
+            resolve(data);
+          })
           .catch(reject);
         });
-      });
+      })
     }
 
     return getPackage(package)
       .then(writePackage)
-      .then(function () {
+      .then(function (data) {
         console.log('Done with package', package);
         return Promise.all(Object.keys(dependencies).map(function (key) {
           return extractPackages(key, dependencies[key], path.join(destination, package, 'package', 'node_modules'));
-        }));
+        }))
+        .then(function () {
+          return data;
+        });
       })
   };
 
@@ -103,22 +108,23 @@ var Extract = function (options) {
 
 var moduleExport = function (options) {
   return Extract(options)
-    .then(function () {
+    .then(function (data) {
       return new Promise(function (resolve, reject) {
-        setTimeout(function () {
-          rmdir(path.resolve('temp', options.dest, options.package), function (err) {
-            if (err) {
-              return reject(err);
-            }
-            resolve();
-          });
-        }, 500);
-
+        rmdir(path.resolve('temp', options.dest, options.package), function (err) {
+          if (err) {
+            return reject(err);
+          }
+          resolve();
+        });
+      })
+      .then(function () {
+        return data;
       });
     })
     .catch(function (err) {
       console.log(err);
     })
 };
+
 
 module.exports = moduleExport;

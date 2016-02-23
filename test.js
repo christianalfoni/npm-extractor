@@ -14,7 +14,8 @@ extract({
   },
   dest: 'node_modules'
 })
-.then(function () {
+.then(function (data) {
+  console.log(data);
   var fullDir = ['/node_modules'];
   var logOutDir = function (dir) {
     var dirs = [];
