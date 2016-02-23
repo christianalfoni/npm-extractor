@@ -118,7 +118,7 @@ var moduleExport = function (options) {
         });
       })
       .then(function () {
-        return data;
+        return data[0];
       });
     })
     .catch(function (err) {

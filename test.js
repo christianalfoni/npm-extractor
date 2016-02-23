@@ -16,22 +16,6 @@ extract({
 })
 .then(function (data) {
   console.log(data);
-  var fullDir = ['/node_modules'];
-  var logOutDir = function (dir) {
-    var dirs = [];
-    try {
-      dirs = mfs.readdirSync(dir);
-      console.log(dir);
-    } catch (e) {
-      return;
-    }
-    dirs.forEach(function (subDir) {
-      fullDir.push(subDir);
-      logOutDir(dir + '/' + subDir);
-      fullDir.pop();
-    });
-  }
-  logOutDir('/node_modules');
 })
 .catch(function (err) {
   console.log(err);
