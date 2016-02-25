@@ -30,7 +30,8 @@ extract({
     retries: 5,
     factor: 5
   },
-  dest: path.resolve('node_modules')
+  tempPath: path.resolve('temp'),
+  memoryPath: '/node_modules'
 })
 .then(function (data) {
   readMemDir(mfs, path.resolve('node_modules'));

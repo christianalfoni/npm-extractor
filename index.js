@@ -36,11 +36,11 @@ var Extract = function (options) {
           );
 
           var unzip = zlib.createGunzip({
-            path: createAbsolutePath(path.resolve('temp', 'unzip'), path.resolve(destination, package)),
+            path: createAbsolutePath(path.resolve(options.tempPath, 'unzip'), path.resolve(destination, package)),
             strip: 0
           });
           var extract = tar.Extract({
-            path: createAbsolutePath(path.resolve('temp'), path.resolve(destination, package)),
+            path: createAbsolutePath(options.tempPath, path.resolve(destination, package)),
             strip: 0
           });
 
@@ -62,7 +62,7 @@ var Extract = function (options) {
 
     var writePackage = function (result) {
       return new Promise(function (resolve, reject) {
-        rreaddir(createAbsolutePath(path.resolve('temp'), path.resolve(destination, package)), function (err, files) {
+        rreaddir(createAbsolutePath(options.tempPath, path.resolve(destination, package)), function (err, files) {
           if (err) {
             return reject();
           }
@@ -72,7 +72,7 @@ var Extract = function (options) {
                 if (err) {
                   reject(err);
                 }
-                var targetPath = file.replace(path.resolve('temp'), path.resolve()).replace(/\/package\//g, '/');
+                var targetPath = file.replace(options.tempPath, '').replace(/\/package\//g, '/');
                 var dirPath = path.dirname(targetPath);
                 dirPath.split(path.sep).reduce(function (fullPath, partPath, index) {
                   fullPath += (index === 1 ? '' : '/') + partPath;
@@ -108,9 +108,9 @@ var Extract = function (options) {
   };
 
   var npm = new Registry(options.options);
-  return extractPackages(options.package, options.version, options.dest)
+  return extractPackages(options.package, options.version, options.memoryPath)
     .catch(function (err) {
-      console.log(err);
+      console.log(err, err.stack);
     });
 }
 
@@ -118,7 +118,7 @@ var moduleExport = function (options) {
   return Extract(options)
     .then(function (data) {
       return new Promise(function (resolve, reject) {
-        rmdir(createAbsolutePath(path.resolve('temp'), path.resolve(options.dest, options.package)), function (err) {
+        rmdir(createAbsolutePath(options.tempPath, path.resolve(options.memoryPath, options.package)), function (err) {
           if (err) {
             return reject(err);
           }
@@ -135,7 +135,7 @@ var moduleExport = function (options) {
       });
     })
     .catch(function (err) {
-      console.log(err);
+      console.log(err, err.stack);
     })
 };
 
