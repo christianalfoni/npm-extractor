@@ -12,7 +12,6 @@ var semver = require('semver');
 
 var createAbsolutePath = function (absolute, relative) {
   var absolutePath = path.join(absolute, path.resolve(relative).replace(path.resolve(), ''));
-  console.log('path', absolutePath);
   return absolutePath;
 }
 
