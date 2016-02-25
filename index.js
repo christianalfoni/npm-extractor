@@ -72,7 +72,8 @@ var Extract = function (options) {
                 if (err) {
                   reject(err);
                 }
-                var targetPath = file.replace(path.resolve('temp'), '').replace(/\/package\//g, '/');
+                var targetPath = file.replace(path.resolve(options.dest, 'temp'), path.resolve(options.dest)).replace(/\/package\//g, '/');
+                console.log(targetPath);
                 var dirPath = path.dirname(targetPath);
                 dirPath.split(path.sep).reduce(function (fullPath, partPath, index) {
                   fullPath += (index === 1 ? '' : '/') + partPath;
