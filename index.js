@@ -10,6 +10,12 @@ var rreaddir = require('recursive-readdir');
 var rmdir = require('rmdir');
 var semver = require('semver');
 
+var createAbsolutePath = function (absolute, relative) {
+  var absolutePath = path.join(absolute, path.resolve(relative).replace(path.resolve(), ''));
+  console.log('path', absolutePath);
+  return absolutePath;
+}
+
 var Extract = function (options) {
 
   var registryURL = options.options.registry;
@@ -31,11 +37,11 @@ var Extract = function (options) {
           );
 
           var unzip = zlib.createGunzip({
-            path: path.resolve('temp', 'unzip', destination, package),
+            path: createAbsolutePath(path.resolve('temp', 'unzip'), path.resolve(destination, package)),
             strip: 0
           });
           var extract = tar.Extract({
-            path: path.resolve('temp', destination, package),
+            path: createAbsolutePath(path.resolve('temp'), path.resolve(destination, package)),
             strip: 0
           });
 
@@ -57,7 +63,7 @@ var Extract = function (options) {
 
     var writePackage = function (result) {
       return new Promise(function (resolve, reject) {
-        rreaddir(path.resolve('temp', destination, package, 'package'), function (err, files) {
+        rreaddir(createAbsolutePath(path.resolve('temp'), path.resolve(destination, package)), function (err, files) {
           if (err) {
             return reject();
           }
@@ -113,7 +119,7 @@ var moduleExport = function (options) {
   return Extract(options)
     .then(function (data) {
       return new Promise(function (resolve, reject) {
-        rmdir(path.resolve('temp', options.dest, options.package), function (err) {
+        rmdir(createAbsolutePath(path.resolve('temp'), path.resolve(options.dest, options.package)), function (err) {
           if (err) {
             return reject(err);
           }
