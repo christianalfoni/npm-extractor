@@ -20,8 +20,8 @@ var readMemDir = function (fs, dir) {
   }
 
 extract({
-  package: 'react',
-  version: '0.14.7',
+  package: 'react-tabs-redux',
+  version: '0.1.2',
   targetFs: mfs,
   options: {
     registry: 'http://registry.npmjs.org/',

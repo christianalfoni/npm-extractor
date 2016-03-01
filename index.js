@@ -98,6 +98,11 @@ var Extract = function (options) {
       .then(writePackage)
       .then(function (result) {
         var dependencies = result.dependencies;
+        options.allPackages.forEach(function (package) {
+          if (dependencies[package]) {
+            delete dependencies[package];
+          }
+        });
         return Promise.all(Object.keys(dependencies).map(function (key) {
           return extractPackages(key, dependencies[key], path.join(destination, package, 'package', 'node_modules'));
         }))
