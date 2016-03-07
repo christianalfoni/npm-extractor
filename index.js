@@ -135,7 +135,8 @@ var moduleExport = function (options) {
         return {
           name: data[0].name,
           version: version,
-          main: data[0].versions[version].main
+          main: data[0].versions[version].main,
+          browser: data[0].versions[version].browser
         };
       });
     })
