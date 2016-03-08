@@ -1,4 +1,3 @@
-var Registry = require('npm-registry');
 var request = require('request');
 var tar = require('tar')
 var zlib = require('zlib');
@@ -20,21 +19,29 @@ var Extract = function (options) {
   var registryURL = options.options.registry;
   var extractPackages = function (package, version, destination) {
 
+    var packageGetUri = package;
+    var specificPackageUri = package.split('/')[package.split('/').length - 1];
+
+    // If leading @
+    if (packageGetUri[0] === '@') {
+      packageGetUri = '@' + encodeURIComponent(packageGetUri.substr(1));
+    }
+
     var getPackage = function (package) {
       return new Promise(function (resolve, reject) {
-        npm.packages.get(package, function (err, data) {
+        request(registryURL + packageGetUri, function (err, response) {
           if (err) {
             return reject();
           }
-
-          version = semver.maxSatisfying(Object.keys(data[0].versions), version);
-          var dependencies = data[0].dependencies || {};
-          var read = request(
+          var data = JSON.parse(response.body);
+          version = semver.maxSatisfying(Object.keys(data.versions), version);
+          var dependencies = data.dependencies || {};
+          var tgzUrl = (
             registryURL +
             package + '/-/' +
-            package + '-' + version + '.tgz'
+            specificPackageUri + '-' + version + '.tgz'
           );
-
+          var read = request(tgzUrl);
           var unzip = zlib.createGunzip({
             path: createAbsolutePath(path.resolve(options.tempPath, 'unzip'), path.resolve(destination, package)),
             strip: 0
@@ -112,10 +119,9 @@ var Extract = function (options) {
       })
   };
 
-  var npm = new Registry(options.options);
   return extractPackages(options.package, options.version, options.memoryPath)
     .catch(function (err) {
-      console.log(err, err.stack);
+      console.log(err);
     });
 }
 
@@ -131,12 +137,12 @@ var moduleExport = function (options) {
         });
       })
       .then(function () {
-        var version = semver.maxSatisfying(Object.keys(data[0].versions), options.version);
+        var version = semver.maxSatisfying(Object.keys(data.versions), options.version);
         return {
-          name: data[0].name,
+          name: data.name,
           version: version,
-          main: data[0].versions[version].main,
-          browser: data[0].versions[version].browser
+          main: data.versions[version].main,
+          browser: data.versions[version].browser
         };
       });
     })

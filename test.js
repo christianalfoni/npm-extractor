@@ -20,8 +20,8 @@ var readMemDir = function (fs, dir) {
   }
 
 extract({
-  package: 'react-tabs-redux',
-  version: '0.1.2',
+  package: 'react',
+  version: '0.14.7',
   targetFs: mfs,
   options: {
     registry: 'http://registry.npmjs.org/',
@@ -30,11 +30,12 @@ extract({
     retries: 5,
     factor: 5
   },
+  allPackages: ['react'],
   tempPath: path.resolve('temp'),
   memoryPath: '/node_modules'
 })
 .then(function (data) {
-  readMemDir(mfs, path.resolve('node_modules'));
+  readMemDir(mfs, path.resolve('/node_modules'));
 })
 .catch(function (err) {
   console.log(err);
