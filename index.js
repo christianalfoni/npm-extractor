@@ -35,7 +35,7 @@ var Extract = function (options) {
           }
           var data = JSON.parse(response.body);
           version = semver.maxSatisfying(Object.keys(data.versions), version);
-          var dependencies = data.dependencies || {};
+          var dependencies = data.versions[version].dependencies || {};
           var tgzUrl = (
             registryURL +
             package + '/-/' +

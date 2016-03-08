@@ -20,8 +20,8 @@ var readMemDir = function (fs, dir) {
   }
 
 extract({
-  package: 'react',
-  version: '0.14.7',
+  package: '@cycle/dom',
+  version: '9.1.0',
   targetFs: mfs,
   options: {
     registry: 'http://registry.npmjs.org/',
@@ -30,7 +30,7 @@ extract({
     retries: 5,
     factor: 5
   },
-  allPackages: ['react'],
+  allPackages: ['@cycle/dom'],
   tempPath: path.resolve('temp'),
   memoryPath: '/node_modules'
 })
