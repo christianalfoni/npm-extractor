@@ -34,9 +34,10 @@ var Extract = function (options) {
             return reject();
           }
           var data = JSON.parse(response.body);
+          var passedVersion = version;
           version = semver.maxSatisfying(Object.keys(data.versions), version);
           if (!data.versions[version]) {
-            return reject('No valid version, ' + version + ', on package ' + package);
+            return reject('No valid version, ' + passedVersion + ', on package ' + package);
           }
           var dependencies = data.versions[version].dependencies || {};
           var tgzUrl = (
