@@ -4,19 +4,32 @@
   "description": "Extracts npm packages into memory",
   "main": "index.js",
   "dependencies": {
+    "body-parser": "^1.15.0",
+    "compression": "^1.6.1",
+    "express": "^4.13.4",
+    "json-loader": "^0.5.4",
+    "mime": "^1.3.4",
+    "node-pre-gyp": "^0.6.23",
+    "nopt": "^3.0.6",
     "npm-registry": "^0.1.13",
     "npm-registry-client": "^7.0.9",
+    "rc": "^1.1.6",
     "recursive": "0.0.2",
     "recursive-readdir": "^1.3.0",
     "request": "^2.69.0",
     "rmdir": "^1.2.0",
     "semver": "^5.1.0",
-    "tar": "^2.2.1"
+    "string-hash": "^1.1.0",
+    "tar": "^2.2.1",
+    "tar-pack": "^3.1.3",
+    "usage": "^0.7.1",
+    "webpack": "^1.12.14"
   },
   "devDependencies": {
     "memory-fs": "^0.3.0"
   },
   "scripts": {
+    "start": "node start",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

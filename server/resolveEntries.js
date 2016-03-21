@@ -1,0 +1,23 @@
+var path = require('path');
+var utils = require('./utils');
+
+module.exports = function (packages) {
+  return function (packagesData) {
+    var entries = packagesData.reduce(function (entries, packageData) {
+      var packageEntry = packageData.main || 'index.js';
+      if (packageData.browser && packageData.browser[packageData.main]) {
+        packageEntry = packageData.browser[packageData.main];
+      }
+      if (!path.extname(packageEntry)) {
+        packageEntry += '.js';
+      }
+      entries[packageData.name] = '.' + path.resolve('/', 'node_modules', packageData.name, packageEntry);
+      return entries;
+    }, {});
+    return {
+      name: utils.getVendorsBundleName(packages),
+      entries: entries,
+      packages: packages
+    };
+  }
+}

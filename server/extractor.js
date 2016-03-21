@@ -40,12 +40,13 @@ var Extract = function (options) {
             return reject('No valid version, ' + passedVersion + ', on package ' + package);
           }
           var dependencies = data.versions[version].dependencies || {};
-          var tgzUrl = (
+          var defaultTgzUrl = data.versions[version].dist ? data.versions[version].dist.tarball : null;
+          var fallbackTgzUrl = (
             registryURL +
             package + '/-/' +
             specificPackageUri + '-' + version + '.tgz'
           );
-          var read = request(tgzUrl);
+          var read = request(defaultTgzUrl || fallbackTgzUrl);
           var unzip = zlib.createGunzip({
             path: createAbsolutePath(path.resolve(options.tempPath, 'unzip'), path.resolve(destination, package)),
             strip: 0
@@ -151,7 +152,7 @@ var moduleExport = function (options) {
       });
     })
     .catch(function (err) {
-      console.log(err, err.stack);
+      throw err;
     })
 };
 
