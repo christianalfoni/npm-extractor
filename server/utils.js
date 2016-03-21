@@ -14,7 +14,7 @@ module.exports = {
     });
     return [basePath].concat(otherPaths).reduce(function (allFiles, entryPath) {
       return allFiles.concat(fs.readdirSync(entryPath).filter(function (file) {
-        return path.extname(file) === '.js' && file !== path.basename(baseEntry);
+        return (path.extname(file) === '.js' || path.extname(file) === '.css') && file !== path.basename(baseEntry);
       }).map(function (file) {
         return path.join(entryPath.substr(14), file);
       }));
