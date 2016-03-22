@@ -41,6 +41,7 @@ module.exports = function (req, res) {
   .then(vendorsBundler.compile)
   .then(cleaner)
   .then(function (bundle) {
+    console.log('Sending response', Object.keys(bundle.packages));
     res.send({
       name: bundle.name,
       entries: bundle.entries,
