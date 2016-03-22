@@ -11,15 +11,22 @@ module.exports = function (req, res) {
   var packages = req.body.packages;
   var vendorsBundleName = utils.getVendorsBundleName(packages);
 
-  if (vendorsQueue.has(vendorsBundleName)) {
+  var existingQueueId = vendorsQueue.getQueueIdByVendorsBundleName(vendorsBundleName)
+  if (existingQueueId) {
     return res.send({
+      id: existingQueueId,
       name: vendorsBundleName,
       inProgress: true
     });
   }
-  vendorsQueue.add(vendorsBundleName);
 
-  return Promise.all(Object.keys(packages).map(function (key) {
+  var queueId = vendorsQueue.add(vendorsBundleName);
+  res.send({
+    id: queueId,
+    name: vendorsBundleName
+  });
+
+  Promise.all(Object.keys(packages).map(function (key) {
     console.log('Extracting package ' + key);
     return extractor({
       package: key,
@@ -41,12 +48,12 @@ module.exports = function (req, res) {
   .then(vendorsBundler.compile)
   .then(cleaner)
   .then(function (bundle) {
-    console.log('Sending response', Object.keys(bundle.packages));
-    res.send({
+    vendorsQueue.update(queueId, {
       name: bundle.name,
       entries: bundle.entries,
       packages: bundle.packages,
-      manifest: memoryFs.fs.readFileSync(path.join('/', 'bundles', bundle.name, 'manifest.json')).toString()
+      manifest: memoryFs.fs.readFileSync(path.join('/', 'bundles', bundle.name, 'manifest.json')).toString(),
+      isDone: true
     });
   })
   .catch(function (err) {
