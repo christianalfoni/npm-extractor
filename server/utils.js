@@ -32,5 +32,9 @@ module.exports = {
       return 0;
     });
     return String(hash(JSON.stringify(packagesList)));
+  },
+  logError: function (err) {
+    console.log(err.message);
+    console.log(err.stack);
   }
 };
