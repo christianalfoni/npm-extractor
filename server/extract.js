@@ -20,6 +20,7 @@ module.exports = function (req, res) {
   vendorsQueue.add(vendorsBundleName);
 
   return Promise.all(Object.keys(packages).map(function (key) {
+    console.log('Extracting package ' + key);
     return extractor({
       package: key,
       targetFs: memoryFs.fs,

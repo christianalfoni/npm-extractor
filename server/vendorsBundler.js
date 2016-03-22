@@ -7,6 +7,7 @@ var vendorEntries = require('./vendorEntries');
 
 module.exports = {
   compile: function (bundle) {
+    console.log('Bundling ' + bundle.packages);
     return new Promise(function (resolve, reject) {
 
       var vendors = Object.keys(bundle.entries).reduce(function (vendors, entryKey) {
