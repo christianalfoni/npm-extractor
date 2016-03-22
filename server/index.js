@@ -6,7 +6,7 @@ var app = express();
 var path = require('path');
 var bodyParser = require('body-parser');
 var extract = require('./extract');
-var preLoadPackages = require('./preLoadPackages');
+var preLoadPackages = require('./preloadPackages');
 var deliver = require('./deliver');
 var status = require('./status');
 

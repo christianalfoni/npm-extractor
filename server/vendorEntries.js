@@ -1,4 +1,6 @@
 module.exports = {
   angular2: ['platform'],
-  lodash: ['fp']
+  lodash: ['fp'],
+  snabbdom: ['modules'],
+  antd: ['lib']
 };
