@@ -11,7 +11,10 @@ module.exports = function (packages) {
       if (!path.extname(packageEntry)) {
         packageEntry += '.js';
       }
-      entries[packageData.name] = '.' + path.resolve('/', 'node_modules', packageData.name, packageEntry);
+      entries[packageData.name] = {
+        path: '.' + path.resolve('/', 'node_modules', packageData.name, packageEntry),
+        isBrowserEntry: Boolean(packageData.browser)
+      };
       return entries;
     }, {});
     return {

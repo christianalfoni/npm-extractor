@@ -7,17 +7,21 @@ var vendorEntries = require('./vendorEntries');
 
 module.exports = {
   compile: function (bundle) {
-    console.log('Bundling ' + Object.keys(bundle.packages));
+    console.log('Bundling ', bundle.entries);
     return new Promise(function (resolve, reject) {
 
       var vendors = Object.keys(bundle.entries).reduce(function (vendors, entryKey) {
         return vendors.concat(entryKey).concat(
-          utils.findEntryPoints(
-            memoryFs.fs,
-            entryKey,
-            bundle.entries[entryKey],
-            vendorEntries[entryKey] || []
-        ));
+          bundle.entries[entryKey].isBrowserEntry ?
+            []
+          :
+            utils.findEntryPoints(
+              memoryFs.fs,
+              entryKey,
+              bundle.entries[entryKey].path,
+              vendorEntries[entryKey] || []
+            )
+        );
       }, []);
 
       var vendorsCompiler = webpack({
