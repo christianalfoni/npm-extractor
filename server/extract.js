@@ -41,12 +41,12 @@ module.exports = function (req, res) {
         factor: 5
       },
       tempPath: path.resolve('temp'),
-      memoryPath: '/node_modules'
+      memoryPath: '/queues/' + queueId + '/node_modules'
     });
   }))
   .then(resolveEntries(packages))
-  .then(vendorsBundler.compile)
-  .then(cleaner)
+  .then(vendorsBundler.compile(queueId))
+  .then(cleaner(queueId))
   .then(function (bundle) {
     vendorsQueue.update(queueId, {
       name: bundle.name,

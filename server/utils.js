@@ -5,15 +5,15 @@ module.exports = {
   isProduction: function () {
     return process.env.NODE_ENV === 'production';
   },
-  findEntryPoints: function (fs, entryKey, baseEntry, otherEntries) {
-    var basePath = path.dirname(baseEntry.substr(1));
+  findEntryPoints: function (fs, entryKey, queuePath, baseEntry, otherEntries) {
+    var basePath = path.dirname(baseEntry.substr(2));
     var otherPaths = otherEntries.map(function (entry) {
       return path.join(basePath, entry);
     }).filter(function (entryPath) {
       return fs.statSync(entryPath).isDirectory();
     });
     return [basePath].concat(otherPaths).reduce(function (allFiles, entryPath) {
-      return allFiles.concat(fs.readdirSync(entryPath).filter(function (file) {
+      return allFiles.concat(fs.readdirSync(path.join(queuePath, entryPath)).filter(function (file) {
         return (path.extname(file) === '.js' || path.extname(file) === '.css') && file !== path.basename(baseEntry);
       }).map(function (file) {
         return path.join(entryPath.substr(14), file);
