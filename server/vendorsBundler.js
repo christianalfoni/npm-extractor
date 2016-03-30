@@ -53,7 +53,7 @@ module.exports = {
              name: 'webpackbin_vendors',
              context: '/'
            }),
-           new webpack.optimize.UglifyJsPlugin({minimize: true})
+           new webpack.optimize.UglifyJsPlugin({minimize: true, mangle: false})
          ],
          module: {
            loaders: [{
