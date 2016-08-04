@@ -4,9 +4,13 @@ var memoryFs = require('./memoryFs');
 var path = require('path');
 var utils = require('./utils');
 var vendorEntries = require('./vendorEntries');
+var merge = require('webpack-merge');
 
 module.exports = {
-  compile: function (queueId) {
+  compile: function (queueId, options) {
+    
+    options = options || {};
+
     return function (bundle) {
       console.log('Bundling ', bundle.entries);
       return new Promise(function (resolve, reject) {
@@ -26,7 +30,7 @@ module.exports = {
           );
         }, []);
 
-        var vendorsCompiler = webpack({
+        var defaultWebpackConfig = {
           context: '/',
           entry: {
             vendors: vendors
@@ -61,7 +65,14 @@ module.exports = {
              loader: 'json'
            }]
          }
-        });
+        };
+
+        var webpackConfig = merge.smart(
+            options.webpack || {},
+            defaultWebpackConfig
+        );
+
+        var vendorsCompiler = webpack(webpackConfig);
         vendorsCompiler.outputFileSystem = memoryFs.fs;
         vendorsCompiler.inputFileSystem = memoryFs.fs;
         vendorsCompiler.resolvers.normal.fileSystem = memoryFs.fs;
