@@ -1,15 +1,14 @@
 var webpack = require('webpack');
-var utils = require('./utils.js');
-var memoryFs = require('./memoryFs');
 var path = require('path');
 var utils = require('./utils');
 var vendorEntries = require('./vendorEntries');
 var merge = require('webpack-merge');
 
 module.exports = {
-  compile: function (queueId, options) {
+  compile: function (options) {
     
     options = options || {};
+    var queueId = options.queueId;
 
     return function (bundle) {
       console.log('Bundling ', bundle.entries);
@@ -21,7 +20,7 @@ module.exports = {
               []
             :
               utils.findEntryPoints(
-                memoryFs.fs,
+                options.targetFs,
                 entryKey,
                 path.join('/', 'queues', queueId),
                 bundle.entries[entryKey].path,
@@ -73,18 +72,18 @@ module.exports = {
         );
 
         var vendorsCompiler = webpack(webpackConfig);
-        vendorsCompiler.outputFileSystem = memoryFs.fs;
-        vendorsCompiler.inputFileSystem = memoryFs.fs;
-        vendorsCompiler.resolvers.normal.fileSystem = memoryFs.fs;
-        vendorsCompiler.resolvers.context.fileSystem = memoryFs.fs;
+        vendorsCompiler.outputFileSystem = options.targetFs;
+        vendorsCompiler.inputFileSystem = options.targetFs;
+        vendorsCompiler.resolvers.normal.fileSystem = options.targetFs;
+        vendorsCompiler.resolvers.context.fileSystem = options.targetFs;
         vendorsCompiler.run(function (err) {
           if (err) {
             return reject(err);
           }
 
           // Rewrite the paths
-          var manifestJson = JSON.parse(memoryFs.fs.readFileSync(path.join('/', 'bundles', bundle.name, 'manifest.json')).toString());
-          memoryFs.fs.writeFileSync(path.join('/', 'bundles', bundle.name, 'manifest.json'), JSON.stringify(
+          var manifestJson = JSON.parse(options.targetFs.readFileSync(path.join('/', 'bundles', bundle.name, 'manifest.json')).toString());
+          options.targetFs.writeFileSync(path.join('/', 'bundles', bundle.name, 'manifest.json'), JSON.stringify(
             Object.assign(manifestJson, {
               content: Object.keys(manifestJson.content).reduce(function (newContent, key) {
                 newContent[key.replace('/queues/' + queueId, '')] = manifestJson.content[key];
