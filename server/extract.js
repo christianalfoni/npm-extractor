@@ -45,8 +45,14 @@ module.exports = function (req, res) {
     });
   }))
   .then(resolveEntries(packages))
-  .then(vendorsBundler.compile(queueId))
-  .then(cleaner(queueId))
+  .then(vendorsBundler.compile({
+      queueId: queueId,
+      targetFs: memoryFs.fs
+  }))
+  .then(cleaner({
+      queueId: queueId,
+      targetFs: memoryFs.fs
+  }))
   .then(function (bundle) {
     vendorsQueue.update(queueId, {
       name: bundle.name,

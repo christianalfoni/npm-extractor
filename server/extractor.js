@@ -1,8 +1,6 @@
 var request = require('request');
 var tar = require('tar')
 var zlib = require('zlib');
-var MemoryFs = require('memory-fs');
-var mfs = new MemoryFs();
 var fs = require('fs');
 var path = require('path');
 var rreaddir = require('recursive-readdir');
