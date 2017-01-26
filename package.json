@@ -4,7 +4,6 @@
   "description": "Extracts npm packages into memory",
   "main": "index.js",
   "dependencies": {
-    "body-parser": "^1.15.0",
     "compression": "^1.6.1",
     "express": "^4.13.4",
     "json-loader": "^0.5.4",

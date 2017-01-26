@@ -4,7 +4,6 @@ var express = require('express');
 var compression = require('compression');
 var app = express();
 var path = require('path');
-var bodyParser = require('body-parser');
 var extract = require('./extract');
 var preLoadPackages = require('./preloadPackages');
 var deliver = require('./deliver');
@@ -27,12 +26,12 @@ preLoadPackages([
 ]);
 
 app.use(compression())
-app.use(bodyParser.json());
 
-app.post('/extract', extract);
-app.get('/bundles/:name/*', deliver);
-app.get('/status', status.get);
-app.get('/queue/:id', vendorsQueue.get);
+app.get('/:packages/dll.js', extract('dll.js'));
+app.get('/:packages/manifest.json', extract('manifest.json'));
+// app.get('/bundles/:name/*', deliver);
+// app.get('/status', status.get);
+// app.get('/queue/:id', vendorsQueue.get);
 
 module.exports = {
   server: server,

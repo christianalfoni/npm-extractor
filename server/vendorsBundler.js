@@ -6,7 +6,7 @@ var merge = require('webpack-merge');
 
 module.exports = {
   compile: function (options) {
-    
+
     options = options || {};
     var queueId = options.queueId;
 
@@ -36,8 +36,8 @@ module.exports = {
           },
           output: {
             path: path.join('/', 'bundles', bundle.name),
-            filename: 'bundle.js',
-            library: 'webpackbin_vendors'
+            filename: 'dll.js',
+            library: bundle.name + '_bundle'
           },
           resolveLoader: {
             root: path.resolve('node_modules')
@@ -53,7 +53,7 @@ module.exports = {
             }),
             new webpack.DllPlugin({
              path: path.join('/', 'bundles', bundle.name, 'manifest.json'),
-             name: 'webpackbin_vendors',
+             name: 'webpack_vendors',
              context: '/'
            }),
            new webpack.optimize.UglifyJsPlugin({minimize: true, mangle: false})
